@@ -7,9 +7,6 @@ using SpreadsheetGUI;
 
 namespace SS
 {
-    /// <summary>
-    /// Keeps track of how many top-level forms are running
-    /// </summary>
     class SpreadsheetContext : ApplicationContext
     {
         // Number of open forms
@@ -57,9 +54,7 @@ namespace SS
 
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+       
         [STAThread]
         static void Main()
         {
