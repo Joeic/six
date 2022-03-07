@@ -15,15 +15,15 @@ using System.Text.RegularExpressions;
 
 namespace SpreadsheetGUI
 {
-   
+    
     public partial class SpreadsheetForm : Form
     {
-        
+       
         Spreadsheet sheet;
        
         int row, col;
 
-     
+        
         public SpreadsheetForm()
         {
             InitializeComponent();
@@ -31,17 +31,19 @@ namespace SpreadsheetGUI
             constructorHelper();
         }
 
-    
+
         private void constructorHelper()
         {
-            row = 0;
-            col = 0;
-            textBoxCellName.Text = "a1";
-            editBox.Text = sheet.GetCellValue("a1").ToString();
-            spreadsheetPanel.SetSelection(0, 0);
+            int zt=0;
+            row = zt;
+            col = zt;
+            string str="a1";
+            textBoxCellName.Text = str;
+            editBox.Text = sheet.GetCellValue(str).ToString();
+            spreadsheetPanel.SetSelection(zt, zt);
         }
 
-      
+       
         private void spreadsheetPanel1_SelectionChanged(SS.SpreadsheetPanel sender)
         {
            
@@ -49,28 +51,31 @@ namespace SpreadsheetGUI
 
             foreach (string s in sheet.SetContentsOfCell(calcCell(col, row), value))
             {
-                sender.SetValue(s[0] - 'a', int.Parse(s.Substring(1)) - 1, sheet.GetCellValue(s).ToString());
+                char temp='a';
+                int inttemp=1;
+                int zs=0;
+                sender.SetValue(s[zs] - temp, int.Parse(s.Substring(inttemp)) - inttemp, sheet.GetCellValue(s).ToString());
             }
 
-     
+            
             sender.GetSelection(out col, out row);
             editBox.Text = sheet.GetCellString(calcCell(col, row));
             textBoxCellName.Text = calcCell(col, row);
             textBoxValue.Text = sheet.GetCellValue(calcCell(col, row)).ToString();
 
-          
+           
             editBox.Focus();
             editBox.SelectAll();
 
         }
 
-     
+      
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            Keys masked = keyData & ~Keys.Modifiers; // remove flags
+            Keys masked = keyData & ~Keys.Modifiers;
             if (editBox.SelectionLength == editBox.Text.Length)
             {
-            
+                
                 switch (masked)
                 {
                     case Keys.Up:
@@ -83,10 +88,10 @@ namespace SpreadsheetGUI
             }
             switch (keyData)
             {
-                case Keys.Enter: // do the enter business
+                case Keys.Enter: 
                     spreadsheetPanel.SetSelection(col, row + 1);
                     return true;
-                case Keys.Tab: // toggle selected text in edit box
+                case Keys.Tab:
                     if(editBox.SelectionLength == editBox.Text.Length)
                     {
                         editBox.Select(editBox.Text.Length, 0);
@@ -96,16 +101,16 @@ namespace SpreadsheetGUI
                         editBox.Select(0, editBox.Text.Length);
                     }
                     return true;
-                case Keys.Control | Keys.S: //ctrl+S
+                case Keys.Control | Keys.S: 
                     saveToolStripMenuItem_Click(null, null);
                     return true;
-                case Keys.Control | Keys.O: //ctrl+O
+                case Keys.Control | Keys.O: 
                     openToolStripMenuItem_Click(null, null);
                     return true;
-                case Keys.Control | Keys.N: //ctrl+N
+                case Keys.Control | Keys.N:
                     newToolStripMenuItem_Click(null, null);
                     return true;
-                case Keys.Control | Keys.E: //ctrl+E
+                case Keys.Control | Keys.E:
                     closeToolStripMenuItem_Click(null, null);
                     return true;
                 default:
@@ -116,56 +121,57 @@ namespace SpreadsheetGUI
       
         private void arrowKeyHelper(Keys key)
         {
-            // remember what flags are there
+           
             bool isCmd = key.HasFlag(Keys.Control);
             bool isShift = key.HasFlag(Keys.Shift);
-            key = key & ~Keys.Modifiers; // remove flags
-            // calc change in cell
-            int dx = 1 * Convert.ToInt32(key == Keys.Right) - 1 * Convert.ToInt32(key == Keys.Left);
-            int dy = 1 * Convert.ToInt32(key == Keys.Down) - 1 * Convert.ToInt32(key == Keys.Up);
-            if (isCmd) // if we need to copy, copy
+            key = key & ~Keys.Modifiers;
+           
+            int tempint=1;
+            int dx = tempint * Convert.ToInt32(key == Keys.Right) - tempint * Convert.ToInt32(key == Keys.Left);
+            int dy = tempint * Convert.ToInt32(key == Keys.Down) - tempint * Convert.ToInt32(key == Keys.Up);
+            if (isCmd)
             {
                 copyHelper(isShift, dx, dy);
             }
             spreadsheetPanel.SetSelection(col + dx, row + dy);
         }
 
-     
+      
         private void copyHelper(bool isShift, int dx, int dy)
         {
-            if (col + dx >= 0 && col + dx < 26 && row + dy >= 0 && row + dy < 100) // if new cell in bounds
+            if (col + dx >= 0 && col + dx < 26 && row + dy >= 0 && row + dy < 100) 
             {
-                string val = sheet.GetCellString(calcCell(col, row)); // get value of cell to copy from
-                if (val.Length > 0 && !isShift && val[0] == '=') // if we gotta change the variables do it
+                string val = sheet.GetCellString(calcCell(col, row)); 
+                if (val.Length > 0 && !isShift && val[0] == '=') 
                 {
                     string newString = "";
-                    foreach (string s in Regex.Split(val, "(=|\\+|-|/|\\*|\\)|\\()")) // iter through tokens
+                    foreach (string s in Regex.Split(val, "(=|\\+|-|/|\\*|\\)|\\()")) 
                     {
                         string temp = s.Trim();
-                        if (Regex.IsMatch(temp, "^[a-zA-Z][0-9]+")) // if matches with variable, change the variable
+                        if (Regex.IsMatch(temp, "^[a-zA-Z][0-9]+")) 
                         {
                             temp = calcCell(temp[0] - 'a' + dx, int.Parse(temp.Substring(1)) - 1 + dy);
-                            newString += temp; // build new string
+                            newString += temp;
                         }
                         else
                         {
-                            newString += s; // build new string
+                            newString += s; 
                         }
                     }
-                    val = newString; // reassign
+                    val = newString;
                 }
                 sheet.SetContentsOfCell(calcCell(col + dx, row + dy), val);
                 spreadsheetPanel.SetValue(col + dx, row + dy, sheet.GetCellValue(calcCell(col + dx, row + dy)).ToString());
             }
         }
 
-     
+      
         private void SpreadsheetForm_Shown(object sender, EventArgs e)
         {
             editBox.Focus();
         }
 
-       
+      
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (sheet.Changed)
@@ -192,10 +198,10 @@ namespace SpreadsheetGUI
 
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        // Get the path of specified file
+                       
                         path = saveFileDialog.FileName;
                     }
-                    else // if cancel pressed
+                    else
                     { 
                         return;
                     }
@@ -204,12 +210,12 @@ namespace SpreadsheetGUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("there was an error saving the file: " + ex.Message); // if error, display
+                MessageBox.Show("something wrong when saving files: " + ex.Message); // if error, display
             }
         }
 
-     
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+       
+        private async void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
@@ -221,39 +227,40 @@ namespace SpreadsheetGUI
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        // get the path of specified file
+                        
                         path = openFileDialog.FileName;
                     }
-                    else // if cancel pressed
+                    else 
                     {
                         return;
                     }
                 }
-                if (sheet.Changed) // if there are unsaved changes, confirm
+                if (sheet.Changed)
                 {
-                    DialogResult dialogResult = MessageBox.Show("There are unsaved changes, are you sure you want to open?", "Unsaved Changes", MessageBoxButtons.YesNo);
+                    DialogResult dialogResult = MessageBox.Show("unsaved changes", MessageBoxButtons.YesNo);
                     if (dialogResult == DialogResult.No)
                     {
                         return;
                     }
                 }
-                //launch new form and close current one.
-                // init values
+               
                 sheet = new Spreadsheet(path, a => Regex.IsMatch(a, "^[a-zA-Z][0-9]+$"), a => a.ToLower(), sheet.GetSavedVersion(path));
                 constructorHelper();
-                // update panel
+               
                 foreach (string s in sheet.GetNamesOfAllNonemptyCells())
                 {
-                    spreadsheetPanel.SetValue(((char)s[0] - 'a'), int.Parse(s.Substring(1)) - 1, sheet.GetCellValue(s).ToString());
+                    char tempchar='a';
+                    int tempint=1;
+                    spreadsheetPanel.SetValue(((char)s[0] - tempchar), int.Parse(s.Substring(tempint)) - tempint, sheet.GetCellValue(s).ToString());
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("there was an error opening the file: " + ex.Message); // if error, notify
+                MessageBox.Show("something wrong when open file:: " + ex.Message); // if error, notify
             }
         }
 
-      
+        
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -262,11 +269,11 @@ namespace SpreadsheetGUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("there was an error opening the file: " + ex.Message);
+                MessageBox.Show("something wrong when open file: " + ex.Message);
             }
         }
 
- 
+       
         private string calcCell(int c, int r) => (char)('a' + c) + (r + 1).ToString();
     }
 }

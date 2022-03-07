@@ -25,17 +25,18 @@ namespace SS
 
 
       
-        private DrawingPanel drawingPanel;
         private HScrollBar hScroll;
         private VScrollBar vScroll;
+        private DrawingPanel drawingPanel;
+
 
       
-        private const int DATA_COL_WIDTH = 80;
-        private const int DATA_ROW_HEIGHT = 20;
-        private const int LABEL_COL_WIDTH = 30;
-        private const int LABEL_ROW_HEIGHT = 30;
+        private const int DATA_COL_WIDTH = 81;
+        private const int DATA_ROW_HEIGHT = 22;
+        private const int LABEL_COL_WIDTH = 31;
+        private const int LABEL_ROW_HEIGHT = 31;
         private const int PADDING = 2;
-        private const int SCROLLBAR_WIDTH = 20;
+        private const int SCROLLBAR_WIDTH = 21;
         private const int COL_COUNT = 26;
         private const int ROW_COUNT = 99;
 
@@ -82,32 +83,32 @@ namespace SS
 
 
 
-        public bool SetValue(int col, int row, string value)
+        public bool SetValue(int c, int r, string v)
         {
-            return drawingPanel.SetValue(col, row, value);
+            return drawingPanel.SetValue(c, r, v);
         }
 
 
      
 
-        public bool GetValue(int col, int row, out string value)
+        public bool GetValue(int c, int r, out string v)
         {
-            return drawingPanel.GetValue(col, row, out value);
+            return drawingPanel.GetValue(c, r, out v);
         }
 
 
 
-        public bool SetSelection(int col, int row)
+        public bool SetSelection(int c, int r)
         {
-            return drawingPanel.SetSelection(col, row);
+            return drawingPanel.SetSelection(c, r);
         }
 
 
        
 
-        public void GetSelection(out int col, out int row)
+        public void GetSelection(out int c, out int r)
         {
-            drawingPanel.GetSelection(out col, out row);
+            drawingPanel.GetSelection(out c, out r);
         }
 
 
@@ -115,7 +116,7 @@ namespace SS
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-            if (FindForm() == null || FindForm().WindowState != FormWindowState.Minimized)
+            if (FindForm() == null )
             {
                 drawingPanel.Size = new Size(Width - SCROLLBAR_WIDTH, Height - SCROLLBAR_WIDTH);
                 vScroll.Location = new Point(Width - SCROLLBAR_WIDTH, 0);
@@ -124,6 +125,19 @@ namespace SS
                 hScroll.Location = new Point(0, Height - SCROLLBAR_WIDTH);
                 hScroll.Size = new Size(Width - SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
                 hScroll.LargeChange = (Width - SCROLLBAR_WIDTH) / DATA_COL_WIDTH;
+                return;
+            }
+
+            if(FindForm().WindowState != FormWindowState.Minimized)
+             {
+                drawingPanel.Size = new Size(Width - SCROLLBAR_WIDTH, Height - SCROLLBAR_WIDTH);
+                vScroll.Location = new Point(Width - SCROLLBAR_WIDTH, 0);
+                vScroll.Size = new Size(SCROLLBAR_WIDTH, Height - SCROLLBAR_WIDTH);
+                vScroll.LargeChange = (Height - SCROLLBAR_WIDTH) / DATA_ROW_HEIGHT;
+                hScroll.Location = new Point(0, Height - SCROLLBAR_WIDTH);
+                hScroll.Size = new Size(Width - SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
+                hScroll.LargeChange = (Width - SCROLLBAR_WIDTH) / DATA_COL_WIDTH;
+                return;
             }
         }
 
@@ -276,11 +290,9 @@ namespace SS
             protected override void OnPaint(PaintEventArgs e)
             {
 
-                // Clip based on what needs to be refreshed.
                 Region clip = new Region(e.ClipRectangle);
                 e.Graphics.Clip = clip;
 
-                // Color the background of the data area white
                 e.Graphics.FillRectangle(
                     new SolidBrush(Color.White),
                     LABEL_COL_WIDTH,
@@ -288,13 +300,11 @@ namespace SS
                     (COL_COUNT - _firstColumn) * DATA_COL_WIDTH,
                     (ROW_COUNT - _firstRow) * DATA_ROW_HEIGHT);
 
-                // Pen, brush, and fonts to use
                 Brush brush = new SolidBrush(Color.Gray);
                 Pen pen = new Pen(brush);
                 Font regularFont = Font;
                 Font boldFont = new Font(regularFont, FontStyle.Bold);
 
-                // Draw the column lines
                 int bottom = LABEL_ROW_HEIGHT + (ROW_COUNT - _firstRow) * DATA_ROW_HEIGHT;
                 e.Graphics.DrawLine(pen, new Point(0, 0), new Point(0, bottom));
                 for (int x = 0; x <= (COL_COUNT - _firstColumn); x++)
@@ -305,14 +315,12 @@ namespace SS
                         new Point(LABEL_COL_WIDTH + x * DATA_COL_WIDTH, bottom));
                 }
 
-                // Draw the column labels
                 for (int x = 0; x < COL_COUNT - _firstColumn; x++)
                 {
                     Font f = (_selectedCol - _firstColumn == x) ? boldFont : Font;
                     DrawColumnLabel(e.Graphics, x, f);
                 }
 
-                // Draw the row lines
                 int right = LABEL_COL_WIDTH + (COL_COUNT - _firstColumn) * DATA_COL_WIDTH;
                 e.Graphics.DrawLine(pen, new Point(0, 0), new Point(right, 0));
                 for (int y = 0; y <= ROW_COUNT - _firstRow; y++)
@@ -323,14 +331,12 @@ namespace SS
                         new Point(right, LABEL_ROW_HEIGHT + y * DATA_ROW_HEIGHT));
                 }
 
-                // Draw the row labels
                 for (int y = 0; y < (ROW_COUNT - _firstRow); y++)
                 {
                     Font f = (_selectedRow - _firstRow == y) ? boldFont : Font;
                     DrawRowLabel(e.Graphics, y, f);
                 }
 
-                // Highlight the selection, if it is visible
                 if ((_selectedCol - _firstColumn >= 0) && (_selectedRow - _firstRow >= 0))
                 {
                     e.Graphics.DrawRectangle(
@@ -341,7 +347,6 @@ namespace SS
                                       DATA_ROW_HEIGHT - 2));
                 }
 
-                // Draw the text
                 foreach (KeyValuePair<Address, String> address in _values)
                 {
                     String text = address.Value;

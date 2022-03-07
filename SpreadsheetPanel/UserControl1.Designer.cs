@@ -9,8 +9,9 @@ namespace SS
        
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
+                if(  (components != null))
                 components.Dispose();
             }
             base.Dispose(disposing);
