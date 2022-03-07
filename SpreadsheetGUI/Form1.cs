@@ -1,5 +1,4 @@
-﻿// SpreadsheetForm class handles most of Controller and Views (combined with SpreadsheetPanel)
-// Author: Herb Wright
+
 
 using System;
 using System.Collections.Generic;
@@ -16,23 +15,15 @@ using System.Text.RegularExpressions;
 
 namespace SpreadsheetGUI
 {
-    /// <summary>
-    /// Spreadsheet form class
-    /// </summary>
+   
     public partial class SpreadsheetForm : Form
     {
-        /// <summary>
-        /// a spreadsheet object to contain the data
-        /// </summary>
+        
         Spreadsheet sheet;
-        /// <summary>
-        /// row and col of current selection
-        /// </summary>
+       
         int row, col;
 
-        /// <summary>
-        /// Constructor Initializes the form and stuff
-        /// </summary>
+     
         public SpreadsheetForm()
         {
             InitializeComponent();
@@ -40,9 +31,7 @@ namespace SpreadsheetGUI
             constructorHelper();
         }
 
-        /// <summary>
-        /// Helper method for constructor, because the code is used in two methods (init values)
-        /// </summary>
+    
         private void constructorHelper()
         {
             row = 0;
@@ -52,13 +41,10 @@ namespace SpreadsheetGUI
             spreadsheetPanel.SetSelection(0, 0);
         }
 
-        /// <summary>
-        /// Is called when a selection is changed, saves the old data, and then moves to the new cell
-        /// </summary>
-        /// <param name="sender"></param>
+      
         private void spreadsheetPanel1_SelectionChanged(SS.SpreadsheetPanel sender)
         {
-            //save previous
+           
             string value = editBox.Text;
 
             foreach (string s in sheet.SetContentsOfCell(calcCell(col, row), value))
@@ -66,30 +52,25 @@ namespace SpreadsheetGUI
                 sender.SetValue(s[0] - 'a', int.Parse(s.Substring(1)) - 1, sheet.GetCellValue(s).ToString());
             }
 
-            //display new cell text
+     
             sender.GetSelection(out col, out row);
             editBox.Text = sheet.GetCellString(calcCell(col, row));
             textBoxCellName.Text = calcCell(col, row);
             textBoxValue.Text = sheet.GetCellValue(calcCell(col, row)).ToString();
 
-            //change focus
+          
             editBox.Focus();
             editBox.SelectAll();
 
         }
 
-        /// <summary>
-        /// overriden method that processes cmd keys.
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <param name="keyData"></param>
-        /// <returns></returns>
+     
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             Keys masked = keyData & ~Keys.Modifiers; // remove flags
             if (editBox.SelectionLength == editBox.Text.Length)
             {
-                // do the arrow keys if arrow key
+            
                 switch (masked)
                 {
                     case Keys.Up:
@@ -132,10 +113,7 @@ namespace SpreadsheetGUI
             }
         }
 
-        /// <summary>
-        /// helper function that processes arrow keys
-        /// </summary>
-        /// <param name="key"></param>
+      
         private void arrowKeyHelper(Keys key)
         {
             // remember what flags are there
@@ -152,12 +130,7 @@ namespace SpreadsheetGUI
             spreadsheetPanel.SetSelection(col + dx, row + dy);
         }
 
-        /// <summary>
-        /// helper function for copying a cell to an adjacent cell
-        /// </summary>
-        /// <param name="isShift"></param>
-        /// <param name="dx"></param>
-        /// <param name="dy"></param>
+     
         private void copyHelper(bool isShift, int dx, int dy)
         {
             if (col + dx >= 0 && col + dx < 26 && row + dy >= 0 && row + dy < 100) // if new cell in bounds
@@ -186,21 +159,13 @@ namespace SpreadsheetGUI
             }
         }
 
-        /// <summary>
-        /// focus on editbox when form is loaded
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+     
         private void SpreadsheetForm_Shown(object sender, EventArgs e)
         {
             editBox.Focus();
         }
 
-        /// <summary>
-        /// handles the close menu item (closes form)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+       
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (sheet.Changed)
@@ -214,11 +179,7 @@ namespace SpreadsheetGUI
             Close();
         }
 
-        /// <summary>
-        /// handles the save menu item (saves form)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+       
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -247,11 +208,7 @@ namespace SpreadsheetGUI
             }
         }
 
-        /// <summary>
-        /// handles the open menu item (opens from file)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+     
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -296,11 +253,7 @@ namespace SpreadsheetGUI
             }
         }
 
-        /// <summary>
-        /// handles the new menu item (opens blank spreadsheet)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+      
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -313,12 +266,7 @@ namespace SpreadsheetGUI
             }
         }
 
-        /// <summary>
-        /// helper that returns string of cell name given col and row
-        /// </summary>
-        /// <param name="c"></param>
-        /// <param name="r"></param>
-        /// <returns></returns>
+ 
         private string calcCell(int c, int r) => (char)('a' + c) + (r + 1).ToString();
     }
 }
