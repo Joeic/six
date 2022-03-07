@@ -1,4 +1,4 @@
-﻿// Written by Joe Zachary for CS 3500, September 2011.
+
 
 using System;
 using System.Collections.Generic;
@@ -10,42 +10,26 @@ namespace SS
 {
 
 
-    /// <summary>
-    /// The type of delegate used to register for SelectionChanged events
-    /// </summary>
-    /// <param name="sender"></param>
+  
 
     public delegate void SelectionChangedHandler(SpreadsheetPanel sender);
 
 
 
-    /// <summary>
-    /// A panel that displays a spreadsheet with 26 columns (labeled A-Z) and 99 rows
-    /// (labeled 1-99).  Each cell on the grid can display a non-editable string.  One 
-    /// of the cells is always selected (and highlighted).  When the selection changes, a 
-    /// SelectionChanged event is fired.  Clients can register to be notified of
-    /// such events.
-    /// 
-    /// None of the cells are editable.  They are for display purposes only.
-    /// </summary>
-
+   
     public partial class SpreadsheetPanel : UserControl
     {
-        /// <summary>
-        /// The event used to send notifications of a selection change
-        /// </summary>
+        
         public event SelectionChangedHandler SelectionChanged;
 
 
 
-        // The SpreadsheetPanel is composed of a DrawingPanel (where the grid is drawn),
-        // a horizontal scroll bar, and a vertical scroll bar.
+      
         private DrawingPanel drawingPanel;
         private HScrollBar hScroll;
         private VScrollBar vScroll;
 
-        // These constants control the layout of the spreadsheet grid.  The height and
-        // width measurements are in pixels.
+      
         private const int DATA_COL_WIDTH = 80;
         private const int DATA_ROW_HEIGHT = 20;
         private const int LABEL_COL_WIDTH = 30;
@@ -56,46 +40,40 @@ namespace SS
         private const int ROW_COUNT = 99;
 
 
-        /// <summary>
-        /// Creates an empty SpreadsheetPanel
-        /// </summary>
+      
 
         public SpreadsheetPanel()
         {
 
             InitializeComponent();
 
-            // The DrawingPanel is quite large, since it has 26 columns and 99 rows.  The
-            // SpreadsheetPanel itself will usually be smaller, which is why scroll bars
-            // are necessary.
+          
             drawingPanel = new DrawingPanel(this);
             drawingPanel.Location = new Point(0, 0);
             drawingPanel.AutoScroll = false;
 
-            // A custom vertical scroll bar.  It is designed to scroll in multiples of rows.
+          
             vScroll = new VScrollBar();
             vScroll.SmallChange = 1;
             vScroll.Maximum = ROW_COUNT;
 
-            // A custom horizontal scroll bar.  It is designed to scroll in multiples of columns.
+      
             hScroll = new HScrollBar();
             hScroll.SmallChange = 1;
             hScroll.Maximum = COL_COUNT;
 
-            // Add the drawing panel and the scroll bars to the SpreadsheetPanel.
+           
             Controls.Add(drawingPanel);
             Controls.Add(vScroll);
             Controls.Add(hScroll);
 
-            // Arrange for the drawing panel to be notified when it needs to scroll itself.
+           
             hScroll.Scroll += drawingPanel.HandleHScroll;
             vScroll.Scroll += drawingPanel.HandleVScroll;
 
         }
 
-        /// <summary>
-        /// Clears the display.
-        /// </summary>
+       
 
         public void Clear()
         {
@@ -103,14 +81,6 @@ namespace SS
         }
 
 
-        /// <summary>
-        /// If the zero-based column and row are in range, sets the value of that
-        /// cell and returns true.  Otherwise, returns false.
-        /// </summary>
-        /// <param name="col"></param>
-        /// <param name="row"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
 
         public bool SetValue(int col, int row, string value)
         {
@@ -118,15 +88,7 @@ namespace SS
         }
 
 
-        /// <summary>
-        /// If the zero-based column and row are in range, assigns the value
-        /// of that cell to the out parameter and returns true.  Otherwise,
-        /// returns false.
-        /// </summary>
-        /// <param name="col"></param>
-        /// <param name="row"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+     
 
         public bool GetValue(int col, int row, out string value)
         {
@@ -134,13 +96,6 @@ namespace SS
         }
 
 
-        /// <summary>
-        /// If the zero-based column and row are in range, uses them to set
-        /// the current selection and returns true.  Otherwise, returns false.
-        /// </summary>
-        /// <param name="col"></param>
-        /// <param name="row"></param>
-        /// <returns></returns>
 
         public bool SetSelection(int col, int row)
         {
@@ -148,12 +103,7 @@ namespace SS
         }
 
 
-        /// <summary>
-        /// Assigns the column and row of the current selection to the
-        /// out parameters.
-        /// </summary>
-        /// <param name="col"></param>
-        /// <param name="row"></param>
+       
 
         public void GetSelection(out int col, out int row)
         {
@@ -161,12 +111,7 @@ namespace SS
         }
 
 
-        /// <summary>
-        /// When the SpreadsheetPanel is resized, we set the size and locations of the three
-        /// components that make it up.
-        /// </summary>
-        /// <param name="eventargs"></param>
-
+     
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
@@ -184,9 +129,6 @@ namespace SS
 
 
 
-        /// <summary>
-        /// Used internally to keep track of cell addresses
-        /// </summary>
 
         private class Address
         {
@@ -218,26 +160,22 @@ namespace SS
         }
 
 
-        /// <summary>
-        /// The panel where the spreadsheet grid is drawn.  It keeps track of the
-        /// current selection as well as what is supposed to be drawn in each cell.
-        /// </summary>
+     
 
         private class DrawingPanel : Panel
         {
-            // Columns and rows are numbered beginning with 0.  This is the coordinate
-            // of the selected cell.
+         
             private int _selectedCol;
             private int _selectedRow;
 
-            // Coordinate of cell in upper-left corner of display
+           
             private int _firstColumn = 0;
             private int _firstRow = 0;
 
-            // The strings contained by the spreadsheet
+          
             private Dictionary<Address, String> _values;
 
-            // The containing panel
+           
             private SpreadsheetPanel _ssp;
 
 
@@ -432,12 +370,6 @@ namespace SS
             }
 
 
-            /// <summary>
-            /// Draws a column label.  The columns are indexed beginning with zero.
-            /// </summary>
-            /// <param name="g"></param>
-            /// <param name="x"></param>
-            /// <param name="f"></param>
             private void DrawColumnLabel(Graphics g, int x, Font f)
             {
                 String label = ((char)('A' + x + _firstColumn)).ToString();
@@ -452,12 +384,7 @@ namespace SS
             }
 
 
-            /// <summary>
-            /// Draws a row label.  The rows are indexed beginning with zero.
-            /// </summary>
-            /// <param name="g"></param>
-            /// <param name="y"></param>
-            /// <param name="f"></param>
+          
             private void DrawRowLabel(Graphics g, int y, Font f)
             {
                 String label = (y + 1 + _firstRow).ToString();
@@ -472,11 +399,7 @@ namespace SS
             }
 
 
-            /// <summary>
-            /// Determines which cell, if any, was clicked.  Generates a SelectionChanged event.  All of
-            /// the indexes are zero based.
-            /// </summary>
-            /// <param name="e"></param>
+           
 
             protected override void OnMouseClick(MouseEventArgs e)
             {
